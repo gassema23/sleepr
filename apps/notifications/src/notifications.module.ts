@@ -9,7 +9,6 @@ import { NotificationsService } from './notifications.service';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      ignoreEnvFile: process.env.NODE_ENV === 'production',
       validationSchema: Joi.object({
         TCP_PORT: Joi.number().required(),
         SMTP_USER: Joi.string().required(),

@@ -10,7 +10,6 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      ignoreEnvFile: process.env.NODE_ENV === 'production',
       validationSchema: Joi.object({
         TCP_PORT: Joi.number().required(),
         STRIPE_SECRET_KEY: Joi.string().required(),

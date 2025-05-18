@@ -21,10 +21,9 @@ import { AUTH_SERVICE } from '@app/common';
     LoggerModule,
     ConfigModule.forRoot({
       isGlobal: true,
-      ignoreEnvFile: process.env.NODE_ENV === 'production',
       validationSchema: Joi.object({
         MONGODB_URI: Joi.string().required(),
-        PORT: Joi.number().default(3000),
+        PORT: Joi.number().required(),
         AUTH_HOST: Joi.string().required(),
         AUTH_PORT: Joi.string().required(),
         PAYMENTS_HOST: Joi.string().required(),
