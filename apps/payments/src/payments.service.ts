@@ -13,22 +13,25 @@ export class PaymentsService {
       this.configService.get('STRIPE_SECRET_KEY', 'sk_test_51RPpJmQBkBbHh71Cmol8wPrIvflacwEOXCsdwKjYerp3wfqH2hUua3JhYh8UfW5jIR9v9PzNn60ETNzFEYHLGc7V00JZDRRcgW'), {
       apiVersion: '2025-04-30.basil',
     });
-   }
+  }
 
 
-  async createCharge({ card, amount }: CreateChargeDto) {
-
+  async createCharge({ amount }: CreateChargeDto) {
+    /*
     const paymentMethod = await this.stripe.paymentMethods.create({
       type: 'card',
       card
-    });
+    });*/
 
     const paymentIntent = await this.stripe.paymentIntents.create({
-      payment_method: paymentMethod.id,
       amount: amount * 100,
       confirm: true,
-      payment_method_types: ['card'],
-      currency: 'cad'
+      currency: 'usd',
+      payment_method: 'pm_card_visa',
+      automatic_payment_methods: {
+        enabled: true,
+        allow_redirects: 'never'
+      },
     });
 
     return paymentIntent;
