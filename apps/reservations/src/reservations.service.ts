@@ -1,53 +1,67 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import {
+  PAYMENTS_SERVICE_NAME,
+  PaymentsServiceClient,
+  UserDto,
+} from '@app/common';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
 import { ReservationsRepository } from './reservations.repository';
-import { PAYMENTS_SERVICE, UserDto } from '@app/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientGrpc } from '@nestjs/microservices';
 import { map } from 'rxjs';
 
 @Injectable()
-export class ReservationsService {
+export class ReservationsService implements OnModuleInit {
+  private paymentsService: PaymentsServiceClient;
+
   constructor(
-    private readonly reservationRepository: ReservationsRepository,
-    @Inject(PAYMENTS_SERVICE) private readonly paymentsService: ClientProxy
-  ) { }
+    private readonly reservationsRepository: ReservationsRepository,
+    @Inject(PAYMENTS_SERVICE_NAME) private readonly client: ClientGrpc,
+  ) {}
 
-  async create(createReservationDto: CreateReservationDto, { email, _id: userId }: UserDto) {
+  onModuleInit() {
+    this.paymentsService = this.client.getService<PaymentsServiceClient>(
+      PAYMENTS_SERVICE_NAME,
+    );
+  }
 
+  async create(
+    createReservationDto: CreateReservationDto,
+    { email, _id: userId }: UserDto,
+  ) {
     return this.paymentsService
-      .send('create_charge', {
+      .createCharge({
         ...createReservationDto.charge,
         email,
       })
       .pipe(
         map((res) => {
-          return this.reservationRepository.create({
+          return this.reservationsRepository.create({
             ...createReservationDto,
             invoiceId: res.id,
-            userId,
             timestamp: new Date(),
+            userId,
           });
-        })
-      )
+        }),
+      );
   }
 
   async findAll() {
-    return this.reservationRepository.find({});
+    return this.reservationsRepository.find({});
   }
 
   async findOne(_id: string) {
-    return this.reservationRepository.findOne({ _id })
+    return this.reservationsRepository.findOne({ _id });
   }
 
   async update(_id: string, updateReservationDto: UpdateReservationDto) {
-    return this.reservationRepository.findOneAndUpdate(
+    return this.reservationsRepository.findOneAndUpdate(
       { _id },
-      { $set: updateReservationDto }
-    )
+      { $set: updateReservationDto },
+    );
   }
 
   async remove(_id: string) {
-    return this.reservationRepository.findOneAndDelete({ _id })
+    return this.reservationsRepository.findOneAndDelete({ _id });
   }
 }
