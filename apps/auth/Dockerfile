@@ -9,7 +9,7 @@ COPY nest-cli.json nest-cli.json
 
 RUN npm install -g pnpm
  
-RUN pnpm install
+RUN pnpm install -r
  
 COPY apps/auth apps/auth
 COPY libs libs
@@ -31,7 +31,7 @@ COPY pnpm*.yaml ./
 
 RUN npm install -g pnpm
 
-RUN pnpm install
+RUN pnpm install -r
 
 COPY --from=development /usr/src/app/dist ./dist
 
