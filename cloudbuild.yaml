@@ -59,3 +59,6 @@ steps:
       'push', 
       'northamerica-northeast1-docker.pkg.dev/sleepr-460214/reservations/production'
     ]
+# Ajoutez cette section à la fin du fichier
+options:
+  logging: CLOUD_LOGGING_ONLY
