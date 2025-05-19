@@ -59,3 +59,5 @@ steps:
       'push', 
       'northamerica-northeast1-docker.pkg.dev/sleepr-460214/reservations/production'
     ]
+
+logsBucket: 'gs://sleepr-460214-cloudbuild-logs'
