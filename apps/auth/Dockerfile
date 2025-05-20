@@ -6,6 +6,7 @@ COPY package.json ./
 COPY pnpm-lock.yaml ./
 COPY tsconfig.json tsconfig.json
 COPY nest-cli.json nest-cli.json
+COPY apps/auth/prisma ./prisma
 
 RUN npm install -g pnpm
 
@@ -34,4 +35,4 @@ RUN pnpm install --prod
 
 COPY --from=development /usr/src/app/dist ./dist
 
-CMD ["node", "dist/apps/auth/main"]
+CMD ["pnpm","run","start:prod", "dist/apps/auth/main"]

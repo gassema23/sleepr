@@ -1,5 +1,5 @@
 {
-  "name": "@sleepr/auth",
+  "name": "@sleepr/reservations",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -12,19 +12,10 @@
   "license": "ISC",
   "packageManager": "pnpm@10.11.0",
   "dependencies": {
-    "@nestjs/jwt": "^11.0.0",
-    "@nestjs/passport": "^11.0.5",
     "@prisma/client": "^6.8.2",
-    "bcryptjs": "^3.0.2",
-    "passport": "^0.6.0",
-    "passport-jwt": "^4.0.1",
-    "passport-local": "^1.0.0",
     "prisma": "^6.8.2"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^3.0.0",
-    "@types/passport-jwt": "^4.0.1",
-    "@types/passport-local": "^1.0.38",
     "dotenv-cli": "^8.0.0"
   }
 }
