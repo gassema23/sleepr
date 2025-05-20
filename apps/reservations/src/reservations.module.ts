@@ -1,23 +1,40 @@
 import { Module } from '@nestjs/common';
+import * as Joi from 'joi';
 import { ReservationsService } from './reservations.service';
 import { ReservationsController } from './reservations.controller';
-import { DatabaseModule, HealthModule, LoggerModule, PAYMENTS_SERVICE } from '@app/common';
-import { ReservationDocument, ReservationSchema } from './models/reservation.schema';
+import {
+  DatabaseModule,
+  LoggerModule,
+  AUTH_SERVICE,
+  PAYMENTS_SERVICE,
+  HealthModule,
+} from '@app/common';
 import { ReservationsRepository } from './reservations.repository';
+import {
+  ReservationDocument,
+  ReservationSchema,
+} from './models/reservation.schema';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import * as Joi from 'joi'
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { AUTH_SERVICE } from '@app/common';
+import { GraphQLModule } from '@nestjs/graphql';
+import {
+  ApolloFederationDriver,
+  ApolloFederationDriverConfig,
+} from '@nestjs/apollo';
+import { ReservationsResolver } from './reservations.resolver';
 
 @Module({
   imports: [
     DatabaseModule,
     DatabaseModule.forFeature([
-      {
-        name: ReservationDocument.name,
-        schema: ReservationSchema
-      }
+      { name: ReservationDocument.name, schema: ReservationSchema },
     ]),
+    GraphQLModule.forRoot<ApolloFederationDriverConfig>({
+      driver: ApolloFederationDriver,
+      autoSchemaFile: {
+        federation: 2,
+      },
+    }),
     LoggerModule,
     ConfigModule.forRoot({
       isGlobal: true,
@@ -25,10 +42,10 @@ import { AUTH_SERVICE } from '@app/common';
         MONGODB_URI: Joi.string().required(),
         PORT: Joi.number().required(),
         AUTH_HOST: Joi.string().required(),
-        AUTH_PORT: Joi.string().required(),
         PAYMENTS_HOST: Joi.string().required(),
-        PAYMENTS_PORT: Joi.string().required(),
-      })
+        AUTH_PORT: Joi.number().required(),
+        PAYMENTS_PORT: Joi.number().required(),
+      }),
     }),
     ClientsModule.registerAsync([
       {
@@ -37,10 +54,10 @@ import { AUTH_SERVICE } from '@app/common';
           transport: Transport.TCP,
           options: {
             host: configService.get('AUTH_HOST'),
-            port: configService.get('AUTH_PORT')
-          }
+            port: configService.get('AUTH_PORT'),
+          },
         }),
-        inject: [ConfigService]
+        inject: [ConfigService],
       },
       {
         name: PAYMENTS_SERVICE,
@@ -48,15 +65,19 @@ import { AUTH_SERVICE } from '@app/common';
           transport: Transport.TCP,
           options: {
             host: configService.get('PAYMENTS_HOST'),
-            port: configService.get('PAYMENTS_PORT')
-          }
+            port: configService.get('PAYMENTS_PORT'),
+          },
         }),
-        inject: [ConfigService]
-      }
+        inject: [ConfigService],
+      },
     ]),
-    HealthModule
+    HealthModule,
   ],
   controllers: [ReservationsController],
-  providers: [ReservationsService, ReservationsRepository],
+  providers: [
+    ReservationsService,
+    ReservationsRepository,
+    ReservationsResolver,
+  ],
 })
-export class ReservationsModule { }
+export class ReservationsModule {}
